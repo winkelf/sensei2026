@@ -1,0 +1,225 @@
+ohdus:
+  - 1
+  - 2
+  - 3
+  - 4
+
+mask_list:
+    - 1     # Neighbor
+    - 4     # Bleed
+    - 8     # Halo
+    - 16    # Crosstalk
+    - 64    # Edge
+    - 128   # Serial register
+    - 512   # Hot pixel
+    - 1024  # Hot column
+    - 4096  # Extended bleed
+    #- 8192 # LEC
+  #- //8194,  // LEC + event?
+    - 16384 # Full well mask
+    - 32768 # Cluster shape
+
+
+mask_list_LEC:
+  - 1     # Neighbor
+  - 4     # Bleed
+  - 8     # Halo
+  - 16    # Crosstalk
+  - 64    # Edge
+  - 128   # Serial register
+  - 512   # Hot pixel
+  - 1024  # Hot column
+  - 4096  # Extended bleed
+  - 8192 # LEC
+  #- //8194,  // LEC + event?
+  - 16384 # Full well mask
+  - 32768 # Cluster shape
+
+
+input_files:
+  ##EXPOSURE72000
+  #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_11_519.root 
+  #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_11_555.root 
+  #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_11_591.root 
+  #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_11_627.root 
+  #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_11_663.root 
+  #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_13_519.root 
+  #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_13_555.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_13_591.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_13_627.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_13_663.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_14_519.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_14_555.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_14_591.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_14_627.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_14_663.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_1_519.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_15_519.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_15_555.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_1_555.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_15_591.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_15_627.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_15_663.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_1_591.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_1_627.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_16_519.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_16_555.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_16_591.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_16_627.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_1_663.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_16_663.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_17_519.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_17_555.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_17_591.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_17_627.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_17_663.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_18_519.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_18_555.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_18_591.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_18_627.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_18_663.root 
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_2_519.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_2_555.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_2_591.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_2_627.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_2_663.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_3_519.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_3_555.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_3_591.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_3_627.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_3_663.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_6_519.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_6_555.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_6_591.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_6_627.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_6_663.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_9_519.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_9_555.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_9_591.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_9_627.root  
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE72000_9_663.root  
+
+    #EXPOSURE216000    
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_11_522.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_11_558.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_11_594.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_11_630.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_11_666.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_13_522.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_13_558.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_13_594.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_13_630.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_13_666.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_14_522.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_14_558.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_14_594.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_14_630.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_14_666.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_1_522.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_15_522.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_15_558.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_1_558.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_15_594.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_15_630.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_15_666.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_1_594.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_1_630.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_16_522.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_16_558.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_16_594.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_16_630.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_16_666.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_1_666.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_17_522.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_17_558.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_17_594.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_17_630.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_17_666.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_18_522.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_18_558.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_18_594.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_18_630.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_18_666.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_2_522.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_2_558.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_2_594.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_2_630.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_2_666.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_3_522.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_3_558.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_3_594.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_3_630.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_3_666.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_6_522.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_6_558.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_6_594.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_6_630.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_6_666.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_9_522.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_9_558.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_9_594.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_9_630.root
+  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_9_666.root    
+
+    ### Exposure0
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_11_516.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_11_525.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_11_534.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_11_543.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_11_552.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_11_561.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_11_570.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_11_579.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_11_588.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_11_597.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_11_606.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_11_615.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_11_624.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_11_633.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_11_642.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_11_651.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_11_660.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_11_669.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_13_516.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_13_525.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_13_534.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_13_543.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_13_552.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_13_561.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_13_570.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_13_579.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_13_588.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_13_597.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_13_606.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_13_615.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_13_624.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_13_633.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_13_642.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_13_651.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_13_660.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_13_669.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_14_516.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_14_525.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_14_534.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_14_543.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_14_552.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_14_561.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_14_570.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_14_579.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_14_588.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_14_597.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_14_606.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_14_615.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_14_624.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_14_633.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_14_642.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_14_651.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_14_660.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_14_669.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_1_516.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_1_525.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_1_534.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_1_543.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_15_516.root
+    #  - /home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE0_15_525.root    
+        
