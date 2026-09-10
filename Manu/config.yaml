@@ -27,9 +27,14 @@ notbad_quads:
 # circular-window radii (in pixels) to scan, to compare which mask size is optimal
 radii: [15, 20, 25, 30]
 
-# absolute paths to processed hitSumm/calPixTree .root files -- point these at
-# your own local copy of the data. Example entries below, edit before running:
-input_files:
-  - /path/to/your/data/hits_corr_proc_skp_sensei_..._11_522.root
-  - /path/to/your/data/hits_corr_proc_skp_sensei_..._11_558.root
-  - /path/to/your/data/hits_corr_proc_skp_sensei_..._13_522.root
+# absolute paths to processed hitSumm/calPixTree .root files, grouped by
+# exposure so mask performance can be compared across exposures too -- point
+# these at your own local copy of the data. Example entries below, edit
+# before running:
+exposures:
+  72000:
+    - /path/to/your/data/hits_corr_proc_skp_sensei_..._EXPOSURE72000_11_519.root
+    - /path/to/your/data/hits_corr_proc_skp_sensei_..._EXPOSURE72000_11_555.root
+  216000:
+    - /path/to/your/data/hits_corr_proc_skp_sensei_..._EXPOSURE216000_11_522.root
+    - /path/to/your/data/hits_corr_proc_skp_sensei_..._EXPOSURE216000_11_558.root

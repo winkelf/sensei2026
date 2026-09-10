@@ -14,16 +14,17 @@
 
 using namespace std;
 
-// finds "r<N>" subfolders of <label>/ (one per radius MaskScanManye.C
-// produced) and returns the radii found, sorted ascending
-vector<int> discoverRadii(const string &label){
+// finds "<prefix><N>" subfolders of <dir>/ (e.g. "r30" or "e72000",
+// one per radius/exposure MaskScanManye.C produced) and returns the
+// N values found, sorted ascending
+vector<int> discoverTaggedSubdirs(const string &dir, char prefix){
 
-    vector<int> radii;
+    vector<int> values;
 
-    TSystemDirectory sysDir(label.c_str(),label.c_str());
+    TSystemDirectory sysDir(dir.c_str(),dir.c_str());
     TList *files = sysDir.GetListOfFiles();
 
-    if(!files) return radii;
+    if(!files) return values;
 
     for(auto obj : *files){
 
@@ -33,21 +34,21 @@ vector<int> discoverRadii(const string &label){
 
         string name = f->GetName();
 
-        if(name.size()<2 || name[0]!='r') continue;
+        if(name.size()<2 || name[0]!=prefix) continue;
 
         string digits = name.substr(1);
 
         if(digits.empty() || !std::all_of(digits.begin(),digits.end(),::isdigit))
             continue;
 
-        radii.push_back(std::stoi(digits));
+        values.push_back(std::stoi(digits));
     }
 
     delete files;
 
-    std::sort(radii.begin(),radii.end());
+    std::sort(values.begin(),values.end());
 
-    return radii;
+    return values;
 }
 
 // running totals across all windows in a category
@@ -107,11 +108,11 @@ void styleAndDraw(TH1D *h, const char *xTitle){
     gPad->SetLogy();
 }
 
-void plotCategory(const string &label, const string &title, int radius){
+void plotCategory(const string &label, const string &title, int exposure, int radius){
 
-    string dir = label+"/r"+to_string(radius);
-    string tag = label+"_r"+to_string(radius);
-    string fullTitle = title+", r="+to_string(radius);
+    string dir = label+"/e"+to_string(exposure)+"/r"+to_string(radius);
+    string tag = label+"_e"+to_string(exposure)+"_r"+to_string(radius);
+    string fullTitle = title+", exposure="+to_string(exposure)+", r="+to_string(radius);
 
     cout << "[" << tag << "] scanning '" << dir << "/' ..." << endl;
 
@@ -254,25 +255,37 @@ void plotCategory(const string &label, const string &title, int radius){
     delete ch;
 }
 
-void plotAllRadii(const string &label, const string &title){
+void plotAllExposuresAndRadii(const string &label, const string &title){
 
-    vector<int> radii = discoverRadii(label);
+    vector<int> exposures = discoverTaggedSubdirs(label,'e');
 
-    if(radii.empty()){
-        cout << "[" << label << "] no r<N> subfolders found under '" << label << "/' -- skipping" << endl;
+    if(exposures.empty()){
+        cout << "[" << label << "] no e<N> subfolders found under '" << label << "/' -- skipping" << endl;
         return;
     }
 
-    for(int radius : radii)
-        plotCategory(label,title,radius);
+    for(int exposure : exposures){
+
+        string expDir = label+"/e"+to_string(exposure);
+
+        vector<int> radii = discoverTaggedSubdirs(expDir,'r');
+
+        if(radii.empty()){
+            cout << "[" << label << "/e" << exposure << "] no r<N> subfolders found -- skipping" << endl;
+            continue;
+        }
+
+        for(int radius : radii)
+            plotCategory(label,title,exposure,radius);
+    }
 }
 
 int PlotWindowStats(){
 
     gROOT->SetBatch(kTRUE);
 
-    plotAllRadii("goodquads",  "good quads");
-    plotAllRadii("notbadquads","not-bad quads");
+    plotAllExposuresAndRadii("goodquads",  "good quads");
+    plotAllExposuresAndRadii("notbadquads","not-bad quads");
 
     return 0;
 }

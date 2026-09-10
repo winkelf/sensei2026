@@ -88,7 +88,7 @@ vector<bool>& getMask(map<DetKey,vector<bool>> &m, const DetKey &k){
     return v;
 }
 
-int windowStudy(const char *fileName, int nImages, int radius,
+int windowStudy(const char *fileName, int nImages, int radius, const char *exposure,
                  const QuadMap &quadMap, const char *label){
 
     gROOT->SetBatch(kTRUE);
@@ -284,10 +284,11 @@ int windowStudy(const char *fileName, int nImages, int radius,
 
     //////////////////////////////////////////////////////////
     // output file -- one subfolder per quad category, then one
-    // per radius, so different radii never overwrite each other
+    // per exposure, then one per radius, so nothing overwrites
+    // anything else
     //////////////////////////////////////////////////////////
 
-    string outDir = string(label)+"/r"+to_string(radius);
+    string outDir = string(label)+"/e"+exposure+"/r"+to_string(radius);
 
     gSystem->mkdir(outDir.c_str(),kTRUE);
 
@@ -309,7 +310,8 @@ int windowStudy(const char *fileName, int nImages, int radius,
     int outY;
 
     int outN;
-    int outRadius = radius;
+    int outRadius   = radius;
+    int outExposure = atoi(exposure);
 
     int outK1;
     int outK2;
@@ -323,6 +325,7 @@ int windowStudy(const char *fileName, int nImages, int radius,
 
     tree->Branch("runID",&outRunID,"runID/I");
     tree->Branch("radius",&outRadius,"radius/I");
+    tree->Branch("exposure",&outExposure,"exposure/I");
 
     tree->Branch("LTA",&outLTA,"LTA/I");
     tree->Branch("OHDU",&outOHDU,"OHDU/I");
@@ -493,8 +496,18 @@ int windowStudy(const char *fileName, int nImages, int radius,
 int MaskScanManye(){
 
     YAML::Node configFile = YAML::LoadFile("config.yaml");
-    vector<string> inputFiles = configFile["input_files"].as<vector<string>>();
     vector<int> radii = configFile["radii"].as<vector<int>>();
+
+    // exposure label (e.g. "72000") -> input files for that exposure
+    map<string,vector<string>> exposureFiles;
+
+    YAML::Node exposureNode = configFile["exposures"];
+
+    for(auto it = exposureNode.begin(); it!=exposureNode.end(); ++it){
+
+        string exposure = it->first.as<string>();
+        exposureFiles[exposure] = it->second.as<vector<string>>();
+    }
 
     QuadMap goodQuads   = loadQuadMap(configFile["good_quads"]);
     QuadMap notBadQuads = loadQuadMap(configFile["notbad_quads"]);
@@ -511,15 +524,22 @@ int MaskScanManye(){
 
     for(auto &cat : categories){
 
-        for(int radius : radii){
+        for(auto &exp : exposureFiles){
 
-            cout << "=== " << cat.label << ", radius=" << radius << " ===" << endl;
+            const string &exposure          = exp.first;
+            const vector<string> &inputFiles = exp.second;
 
-            int nImages = 0;
+            for(int radius : radii){
 
-            for (const auto& rf : inputFiles) {
-              nImages+=1;
-              int qs = windowStudy(rf.c_str(),nImages,radius,cat.quads,cat.label.c_str());
+                cout << "=== " << cat.label << ", exposure=" << exposure
+                     << ", radius=" << radius << " ===" << endl;
+
+                int nImages = 0;
+
+                for (const auto& rf : inputFiles) {
+                  nImages+=1;
+                  int qs = windowStudy(rf.c_str(),nImages,radius,exposure.c_str(),cat.quads,cat.label.c_str());
+                }
             }
         }
     }
