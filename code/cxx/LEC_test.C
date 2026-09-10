@@ -45,17 +45,19 @@ int extractLTA(const string& fileName) {
   return stoi(ltaStr);
 }
 
-// Only these LTAs/ohdus (the "good quads") are processed; any other LTA is skipped.
-static const map<int, vector<int>> GOOD_QUADS = {
-  {3,  {2}},
+// Per-LTA OHDU selection requested for this test run.
+static const map<int, vector<int>> LTA_OHDUS = {
+  {2,  {1, 2, 3, 4}},
+  {3,  {1, 2, 3, 4}},
+  {6,  {1, 2, 3, 4}},
   {9,  {1, 2}},
-  {11, {1, 2, 3}},
+  {11, {1, 2, 3, 4}},
   {13, {2, 3, 4}},
-  {14, {1, 3}},
-  {15, {2}},
-  {16, {3}},
+  {14, {1, 2, 3, 4}},
+  {15, {1, 2, 3, 4}},
+  {16, {1, 2, 3, 4}},
   {17, {1, 2, 3, 4}},
-  {18, {1, 2, 3}},
+  {18, {1, 2, 3, 4}},
 };
 
 vector<int> analyze(vector<int> maskList, float threshold, string fileName, int ohdu, TH1D* hq) {
@@ -116,15 +118,14 @@ vector<int> analyze(vector<int> maskList, float threshold, string fileName, int 
 ////////////////////////////////////////////                Main           /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int LEC(){
+int LEC_test(){
 
   // Make list of thresholds/cut values to loop over	
   //vector<float> thresholds = {0.1};
-  vector<float> thresholds = {};
-  //for (float i=0; i<0.01; i+=0.0005) thresholds.push_back(static_cast<float>(i));
-  //for (float i=0; i<0.1; i+=0.005) thresholds.push_back(static_cast<float>(i));
-  //for (float i=0; i<0.05; i+=0.0005) thresholds.push_back(static_cast<float>(i));
-  for (float i=0; i<0.01; i+=0.001) thresholds.push_back(static_cast<float>(i));
+  vector<float> thresholds = {
+    0.0f, 0.0004f, 0.0008f, 0.001f, 0.0012f, 0.0016f, 0.002f,
+    0.003f, 0.004f, 0.005f, 0.006f, 0.007f, 0.008f, 0.009f
+  };
 
   gStyle->SetPadTickX(1);
   gStyle->SetPadTickY(1);
@@ -145,7 +146,7 @@ int LEC(){
   gStyle->SetTitleFontSize(0.025);
 
   // input files
-  YAML::Node configFile = YAML::LoadFile("../config/config.yaml");
+  YAML::Node configFile = YAML::LoadFile("../config/config_test.yaml");
   vector<string> inputFiles = configFile["input_files"].as<vector<string>>();
   vector<int>    ohdus      = configFile["ohdus"].as<vector<int>>();
   vector<int>    maskList   = configFile["mask_list_LEC"].as<vector<int>>();
@@ -194,12 +195,7 @@ int LEC(){
       cout<<"                "<< rf                               <<endl;
 
       int lta = extractLTA(rf);
-      auto ltaIt = GOOD_QUADS.find(lta);
-      if (ltaIt == GOOD_QUADS.end()) {
-        cout<<"                   *skipping LTA "<< lta <<" (not in GOOD_QUADS)"<<endl;
-        continue;
-      }
-      const vector<int>& fileOhdus = ltaIt->second;
+      const vector<int>& fileOhdus = LTA_OHDUS.at(lta);
 
       for (int oh=0; oh<fileOhdus.size(); oh++){
         int ohdu = fileOhdus.at(oh);
@@ -235,9 +231,9 @@ int LEC(){
 
 
   // output txt to plot with python
-  std::ofstream outFile0("./txts/LEC_survElec.txt");
-  std::ofstream outFile1("./txts/LEC_survPix.txt");
-  std::ofstream outFile2("./txts/LEC_rates.txt");
+  std::ofstream outFile0("./new_test_results/txts/LEC_survElec.txt");
+  std::ofstream outFile1("./new_test_results/txts/LEC_survPix.txt");
+  std::ofstream outFile2("./new_test_results/txts/LEC_rates.txt");
 
   if (!outFile0) { cerr << "Error opening file for writing!" << endl; }
   if (!outFile1) { cerr << "Error opening file for writing!" << endl; }

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <set>
 #include <algorithm>
@@ -13,6 +14,7 @@
 #include "TPaveText.h"
 #include "TBox.h"
 #include "TEllipse.h"
+#include "TArc.h"
 #include "TFile.h"
 #include "TLegend.h"
 #include "TAxis.h"

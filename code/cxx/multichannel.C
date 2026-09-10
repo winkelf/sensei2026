@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <set>
+#include <map>
 #include <algorithm>
 #include <random>
 #include <cmath>
@@ -33,6 +34,29 @@
 
 using namespace chrono;
 using namespace std;
+
+// Extract the LTA number from a filename of the form
+// "..._EXPOSURE216000_<LTA>_<runId>.root"
+int extractLTA(const string& fileName) {
+  size_t dot = fileName.find_last_of('.');
+  size_t lastUnderscore = fileName.find_last_of('_', dot - 1);
+  size_t ltaUnderscore = fileName.find_last_of('_', lastUnderscore - 1);
+  string ltaStr = fileName.substr(ltaUnderscore + 1, lastUnderscore - ltaUnderscore - 1);
+  return stoi(ltaStr);
+}
+
+// Only these LTAs/ohdus (the "good quads") are processed; any other LTA is skipped.
+static const map<int, vector<int>> GOOD_QUADS = {
+  {3,  {2}},
+  {9,  {1, 2}},
+  {11, {1, 2, 3}},
+  {13, {2, 3, 4}},
+  {14, {1, 3}},
+  {15, {2}},
+  {16, {3}},
+  {17, {1, 2, 3, 4}},
+  {18, {1, 2, 3}},
+};
 
 // Dynamic mask bit used by this algorithm.
 // It is OR-ed with the pre-existing mask so previous mask bits are preserved.
@@ -329,8 +353,16 @@ int multichannel(){
       cout<<"  READING FILE: "<< nImages << "/"<< nImagesInConfig <<endl;
       cout<<"                "<< rf                               <<endl;
 
-      for (int oh=0; oh<ohdus.size(); oh++){
-        int ohdu = ohdus.at(oh);
+      int lta = extractLTA(rf);
+      auto ltaIt = GOOD_QUADS.find(lta);
+      if (ltaIt == GOOD_QUADS.end()) {
+        cout<<"                   *skipping LTA "<< lta <<" (not in GOOD_QUADS)"<<endl;
+        continue;
+      }
+      const vector<int>& fileOhdus = ltaIt->second;
+
+      for (int oh=0; oh<fileOhdus.size(); oh++){
+        int ohdu = fileOhdus.at(oh);
 
         cout<<"                   *ohdu "<< ohdu << endl;
 
@@ -376,14 +408,6 @@ int multichannel(){
 
   cout << " "<<  endl;
   cout << " "<<  endl;
-//  canvasMaker(hN,    "Distribution of N",     "./pdfs/hN.pdf");
-//  canvasMaker(h_k1,  "Distribution of k_{1}", "./pdfs/k1.pdf");
-//  canvasMaker(h_k2,  "Distribution of k_{2}", "./pdfs/k2.pdf");
-//  canvasMaker(h_k3,  "Distribution of k_{3}", "./pdfs/k3.pdf");
-//  canvasMaker(hq_1e, "q = #frac{k_{1}}{N}",   "./pdfs/q_statistic_1e.pdf");
-//  canvasMaker(hq_2e, "q = #frac{k_{2}}{N}",   "./pdfs/q_statistic_2e.pdf");
-//  canvasMaker(hq_3e, "q = #frac{k_{3}}{N}",   "./pdfs/q_statistic_3e.pdf");
-//  canvasMaker(hq_4e, "q = #frac{k_{4}}{N}",   "./pdfs/q_statistic_4e.pdf");
 
   // chrono
   auto b = high_resolution_clock::now();
@@ -427,6 +451,71 @@ int multichannel(){
   outFile0.close();
   outFile1.close();
   outFile2.close();
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Extra diagnostic run at threshold = 0.1, over the good quads only.
+  // Not written to txts: produces pdf plots and a root file with the
+  // histograms instead.
+  ////////////////////////////////////////////////////////////////////////////
+
+  cout << " "<<  endl;
+  cout<<"==================================================================================================================================================================================="<<endl;
+  cout<<"Extra run at threshold = 0.1 (pdfs + root file only, no txt output)"<<endl;
+  cout<<"==================================================================================================================================================================================="<<endl;
+
+  float extraThreshold = 0.1f;
+
+  // Binning tuned from a first pass over this dataset: q = k/N piles up
+  // within a fraction of the [0, 0.1) range used elsewhere, so a uniform
+  // 50-bin/0.1 axis crushes the whole distribution into its first bin.
+  TH1D* hN_01    = new TH1D("hN_01",    "Distribution of N per window",        100, 0,    3000);
+  TH1D* h_k1_01  = new TH1D("h_k1_01",  "Distribution of k_{1} per window",    20,  0,    20);
+  TH1D* h_k2_01  = new TH1D("h_k2_01",  "Distribution of k_{2} per window",    20,  0,    20);
+  TH1D* h_k3_01  = new TH1D("h_k3_01",  "Distribution of k_{3} per window",    20,  0,    20);
+  TH1D* hq_1e_01 = new TH1D("hq_1e_01", "Distribution of q_{1} = #frac{k}{N}", 400, 0,    0.02);
+  TH1D* hq_2e_01 = new TH1D("hq_2e_01", "Distribution of q_{2} = #frac{k}{N}", 200, 0,    0.002);
+  TH1D* hq_3e_01 = new TH1D("hq_3e_01", "Distribution of q_{3} = #frac{k}{N}", 200, 0,    0.002);
+  TH1D* hq_4e_01 = new TH1D("hq_4e_01", "Distribution of q_{4} = #frac{k}{N}", 200, 0,    0.002);
+
+  for (const auto& rf : inputFiles) {
+
+    int lta = extractLTA(rf);
+    auto ltaIt = GOOD_QUADS.find(lta);
+    if (ltaIt == GOOD_QUADS.end()) continue;
+    const vector<int>& fileOhdus = ltaIt->second;
+
+    cout<<"  READING FILE: "<< rf << endl;
+
+    for (int oh=0; oh<fileOhdus.size(); oh++){
+      int ohdu = fileOhdus.at(oh);
+
+      cout<<"                   *ohdu "<< ohdu << endl;
+
+      analyze(extraThreshold, rf, ohdu,
+              hq_1e_01, hq_2e_01, hq_3e_01, hq_4e_01,
+              hN_01, h_k1_01, h_k2_01, h_k3_01);
+    }
+  }
+
+  canvasMaker(hN_01,    "Distribution of N",     "./pdfs/hN_thr0p1.pdf");
+  canvasMaker(h_k1_01,  "Distribution of k_{1}", "./pdfs/k1_thr0p1.pdf");
+  canvasMaker(h_k2_01,  "Distribution of k_{2}", "./pdfs/k2_thr0p1.pdf");
+  canvasMaker(h_k3_01,  "Distribution of k_{3}", "./pdfs/k3_thr0p1.pdf");
+  canvasMaker(hq_1e_01, "q = #frac{k_{1}}{N}",   "./pdfs/q_statistic_1e_thr0p1.pdf");
+  canvasMaker(hq_2e_01, "q = #frac{k_{2}}{N}",   "./pdfs/q_statistic_2e_thr0p1.pdf");
+  canvasMaker(hq_3e_01, "q = #frac{k_{3}}{N}",   "./pdfs/q_statistic_3e_thr0p1.pdf");
+  canvasMaker(hq_4e_01, "q = #frac{k_{4}}{N}",   "./pdfs/q_statistic_4e_thr0p1.pdf");
+
+  TFile* outRootFile = new TFile("./root/multichannel_thr0p1.root", "RECREATE");
+  hN_01   ->Write();
+  h_k1_01 ->Write();
+  h_k2_01 ->Write();
+  h_k3_01 ->Write();
+  hq_1e_01->Write();
+  hq_2e_01->Write();
+  hq_3e_01->Write();
+  hq_4e_01->Write();
+  outRootFile->Close();
 
   return 0;
 }

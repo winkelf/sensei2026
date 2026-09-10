@@ -260,7 +260,10 @@ vector<int> analyze(float threshold,
 int multichannel_test(){
 
   // Make list of thresholds/cut values to loop over
-  vector<float> thresholds = {0.1};
+  vector<float> thresholds = {
+    0.0f, 0.0004f, 0.0008f, 0.001f, 0.0012f, 0.0016f, 0.002f,
+    0.003f, 0.004f, 0.005f, 0.006f, 0.007f, 0.008f, 0.009f
+  };
 
   gStyle->SetPadTickX(1);
   gStyle->SetPadTickY(1);
@@ -403,43 +406,6 @@ int multichannel_test(){
 
   cout << " "<<  endl;
   cout << " "<<  endl;
-  // Combine all diagnostic plots into a single multi-page PDF.
-  {
-    string pdfName = "./new_test_results/summary.pdf";
-    vector<pair<TH1D*, string>> plots = {
-      {hN,    "Distribution of N"},
-      {h_k1,  "Distribution of k_{1}"},
-      {h_k2,  "Distribution of k_{2}"},
-      {h_k3,  "Distribution of k_{3}"},
-      {hq_1e, "q = #frac{k_{1}}{N}"},
-      {hq_2e, "q = #frac{k_{2}}{N}"},
-      {hq_3e, "q = #frac{k_{3}}{N}"},
-      {hq_4e, "q = #frac{k_{4}}{N}"},
-    };
-
-    for (size_t i = 0; i < plots.size(); ++i) {
-      TH1D* hist = plots[i].first;
-      const string& title = plots[i].second;
-
-      TCanvas* canv = new TCanvas(title.c_str());
-      canv->SetFillColor(kBlack);
-      canv->SetBatch(kTRUE);
-      hist->SetStats(0);
-      hist->GetXaxis()->SetTitle(title.c_str());
-      hist->GetYaxis()->SetTitle("Number of entries");
-      hist->GetYaxis()->SetAxisColor(kWhite);
-      hist->GetXaxis()->SetAxisColor(kWhite);
-      hist->Draw("HIST");
-      canv->SetLogy();
-
-      string pageName = pdfName;
-      if (i == 0) pageName += "(";
-      else if (i == plots.size() - 1) pageName += ")";
-
-      canv->Print(pageName.c_str());
-      canv->Close();
-    }
-  }
 
   // chrono
   auto b = high_resolution_clock::now();
@@ -450,6 +416,39 @@ int multichannel_test(){
   cout << "================== "<<  endl;
   cout << " "<<  endl;
   cout << " "<<  endl;
+
+  // output txt to plot with python
+  std::ofstream outFile0("./new_test_results/txts/more_survElec.txt");
+  std::ofstream outFile1("./new_test_results/txts/more_survPix.txt");
+  std::ofstream outFile2("./new_test_results/txts/more_rates.txt");
+
+  if (!outFile0) { cerr << "Error opening file for writing!" << endl; }
+  if (!outFile1) { cerr << "Error opening file for writing!" << endl; }
+  if (!outFile2) { cerr << "Error opening file for writing!" << endl; }
+
+  for (size_t t = 0; t < thresholds.size(); ++t) {
+    outFile0 << thresholds.at(t) << "\t"
+             << n1ElectronEventsVec.at(t) << "\t"
+             << n2ElectronEventsVec.at(t) << "\t"
+             << n3ElectronEventsVec.at(t) << "\t"
+             << n4ElectronEventsVec.at(t) << endl;
+
+    outFile1 << thresholds.at(t) << "\t"
+             << unmaskedPixels1eVec.at(t) << "\t"
+             << unmaskedPixels2eVec.at(t) << "\t"
+             << unmaskedPixels3eVec.at(t) << "\t"
+             << unmaskedPixels4eVec.at(t) << endl;
+
+    outFile2 << thresholds.at(t) << "\t"
+             << oneElectronRateVec.at(t) << "\t"
+             << twoElectronRateVec.at(t) << "\t"
+             << threeElectronRateVec.at(t) << "\t"
+             << fourElectronRateVec.at(t) << endl;
+  }
+
+  outFile0.close();
+  outFile1.close();
+  outFile2.close();
 
   return 0;
 }

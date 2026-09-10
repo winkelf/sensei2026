@@ -17,9 +17,9 @@ def upperLimit(obs_number_input):
 
 # Load all data
 filenames = [
-    ("../cxx/txts/more_survElec.txt",    "../cxx/txts/LEC_survElec.txt", 'Number of unmasked n-electron events vs q cut', "Number of unmasked n-electron events"),
-    ("../cxx/txts/more_survPix.txt",     "../cxx/txts/LEC_survPix.txt",  "Number of unmasked pixels vs q cut",            "Number of unmasked pixels"),
-    ("../cxx/txts/more_rates.txt",       "../cxx/txts/LEC_rates.txt",    "Rates vs q cut",                                 "n-Electron rate")
+    ("../cxx/new_test_results/txts/more_survElec.txt",    "../cxx/new_test_results/txts/LEC_survElec.txt", 'Number of unmasked n-electron events vs q cut', "Number of unmasked n-electron events"),
+    ("../cxx/new_test_results/txts/more_survPix.txt",     "../cxx/new_test_results/txts/LEC_survPix.txt",  "Number of unmasked pixels vs q cut",            "Number of unmasked pixels"),
+    ("../cxx/new_test_results/txts/more_rates.txt",       "../cxx/new_test_results/txts/LEC_rates.txt",    "Rates vs q cut",                                 "n-Electron rate")
 ]
 
 data = []
@@ -117,7 +117,7 @@ ax2.set_ylim(bottom=0)
 ax2.grid(True, linestyle=':')
 ax2.legend()
 
-pdfName = "rates.pdf"
+pdfName = "../cxx/new_test_results/rates_test.pdf"
 
 plt.tight_layout()
 #plt.savefig("summary_plots.pdf")
