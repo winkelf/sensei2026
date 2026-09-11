@@ -88,19 +88,33 @@ vector<bool>& getMask(map<DetKey,vector<bool>> &m, const DetKey &k){
     return v;
 }
 
+// maskBits: combined bad-pixel mask (defaults to excluding the "Neighbor"
+// and "Cluster shape" bits, which get set on multi-electron hits themselves
+// rather than on defective pixels) -- pass a different value (e.g. with the
+// LEC bit 0x2000 added) to study an alternate masking strategy
+// pathTag: inserted into the output directory right after "<label>/", e.g.
+// "lec/" to keep an alternate-mask run from overwriting the default one
 int windowStudy(const char *fileName, int nImages, int radius, const char *exposure,
-                 const QuadMap &quadMap, const char *label){
+                 const QuadMap &quadMap, const char *label,
+                 int maskBits=0x56FC, const char *pathTag=""){
 
     gROOT->SetBatch(kTRUE);
 
     //////////////////////////////////////////////////////////
-    // masks
+    // resume support -- if this output already exists (e.g. a previous
+    // run was interrupted partway through), skip straight past the
+    // expensive part instead of redoing it
     //////////////////////////////////////////////////////////
 
-    // combined bad-pixel mask (excludes the "Neighbor" and
-    // "Cluster shape" bits, which get set on multi-electron
-    // hits themselves rather than on defective pixels)
-    const int maskBits = 0x56FC;
+    string outDir = string(label)+"/"+pathTag+"e"+exposure+"/r"+to_string(radius);
+
+    string outName =
+        outDir+"/windowStatisticsManye_"+label+"_"+to_string(nImages)+".root";
+
+    if(!gSystem->AccessPathName(outName.c_str())){
+        cout << "Already exists, skipping: " << outName << endl;
+        return 0;
+    }
 
     //////////////////////////////////////////////////////////
     // input
@@ -288,12 +302,7 @@ int windowStudy(const char *fileName, int nImages, int radius, const char *expos
     // anything else
     //////////////////////////////////////////////////////////
 
-    string outDir = string(label)+"/e"+exposure+"/r"+to_string(radius);
-
     gSystem->mkdir(outDir.c_str(),kTRUE);
-
-    string outName =
-        outDir+"/windowStatisticsManye_"+label+"_"+to_string(nImages)+".root";
 
     TFile *out =
         new TFile(outName.c_str(),"RECREATE");
@@ -312,6 +321,7 @@ int windowStudy(const char *fileName, int nImages, int radius, const char *expos
     int outN;
     int outRadius   = radius;
     int outExposure = atoi(exposure);
+    int outMaskBits = maskBits;
 
     int outK1;
     int outK2;
@@ -326,6 +336,7 @@ int windowStudy(const char *fileName, int nImages, int radius, const char *expos
     tree->Branch("runID",&outRunID,"runID/I");
     tree->Branch("radius",&outRadius,"radius/I");
     tree->Branch("exposure",&outExposure,"exposure/I");
+    tree->Branch("maskBits",&outMaskBits,"maskBits/I");
 
     tree->Branch("LTA",&outLTA,"LTA/I");
     tree->Branch("OHDU",&outOHDU,"OHDU/I");
