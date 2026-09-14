@@ -32,13 +32,25 @@ mask performance changes with exposure time).
   types/helpers/`windowStudy()`, and only defines its own `MaskScanManyeLEC()`
   entry point, so running it doesn't touch or require the standard-mask
   output.
-- `PlotQ1CutScan.C` -- for each (category, exposure, radius), scans a q1 =
-  k1/N cut from 0 up to `min(0.02, highest observed q1)`, keeping only
-  windows with q1 < cut at each step, and plots k1-k4, N, and k_i/N vs. the
-  cut (3 PDFs per combination). Each plot overlays the single LEC reference
-  value (dashed line) from `MaskScanManyeLEC.C`'s output, so you can see
-  directly whether tightening the q1 cut can match what the LEC mask
-  achieves. `#include`s `PlotWindowStats.C` to reuse its helpers.
+- `PlotQ1CutScan.C` -- for each (category, exposure, radius) and for each
+  channel i in {1,2,3,4} **independently** (no weighting), scans a q_i =
+  k_i/N cut from 0 up to `min(kMaxQCut, highest observed q_i)` (a small,
+  hand-tuned cap so the region where the curve crosses its LEC reference is
+  visible instead of squashed by the full data range), keeping only windows
+  with q_i < cut at each step. Produces two PDFs per combination:
+  - `qcut_scan_summary_*.pdf` -- k_i, N ("living pixels" kept, one curve per
+    channel since each channel's cut admits a different set of windows), and
+    q_i = k_i/N, each of the 4 channels vs. its own cut, with LEC reference
+    lines from `MaskScanManyeLEC.C`'s output, so you can see directly
+    whether tightening a channel's q cut can match what the LEC mask
+    achieves for that channel.
+  - `qcut_distribution_*.pdf` -- a safety-check histogram (log-x) of the
+    full q1-q4 distributions (unweighted, matching the scan) plus, for
+    reference only, a weighted-combined distribution q = (k1 + 5*k2 +
+    10*(k3+k4))/N (not used by the scan itself), all with LEC reference
+    lines.
+
+  `#include`s `PlotWindowStats.C` to reuse its helpers.
 - `config.yaml` -- defines the quad selections, radii to scan, and input
   files grouped by exposure. **Edit `exposures` to point at your own local
   copy of the data** before running -- the paths shipped here are
@@ -82,9 +94,8 @@ goodquads/
     r15/  windowStatisticsManye_goodquads_1.root ... _60.root
           k_statistics_summary_goodquads_e72000_r15.pdf
           q_statistics_summary_goodquads_e72000_r15.pdf
-          q1cut_k_scan_goodquads_e72000_r15.pdf
-          q1cut_N_scan_goodquads_e72000_r15.pdf
-          q1cut_ratio_scan_goodquads_e72000_r15.pdf
+          qcut_scan_summary_goodquads_e72000_r15.pdf
+          qcut_distribution_goodquads_e72000_r15.pdf
     r20/  ...
     r25/  ...
     r30/  ...
@@ -117,12 +128,16 @@ notbadquads/
   exposure and radius, plus a stats box with totals.
 - `q_statistics_summary_<category>_e<exposure>_r<radius>.pdf` -- same, but
   for q1-q4 = k1-k4 / N (per-window rates), plus N.
-- `q1cut_k_scan_<category>_e<exposure>_r<radius>.pdf`,
-  `q1cut_N_scan_..._.pdf`, `q1cut_ratio_scan_..._.pdf` -- k1-k4, N, and
-  k_i/N as a function of a q1 = k1/N cut (windows with q1 above the cut are
-  dropped), each with the corresponding LEC-mask reference value overlaid as
-  a dashed line. Produced by `PlotQ1CutScan.C` from the standard-mask output
-  plus the single reference computed once from `lec/`.
+- `qcut_scan_summary_<category>_e<exposure>_r<radius>.pdf` -- k_i, N, and
+  q_i = k_i/N, each of the 4 channels (i=1..4) scanned independently against
+  its own q_i cut (windows with q_i above that channel's cut are dropped for
+  that channel's curve), with LEC-mask reference lines overlaid. Produced by
+  `PlotQ1CutScan.C` from the standard-mask output plus the reference values
+  computed once from `lec/`.
+- `qcut_distribution_<category>_e<exposure>_r<radius>.pdf` -- a safety-check
+  histogram of the q1-q4 distributions (log-x), plus a weighted-combined
+  q = (k1 + 5*k2 + 10*(k3+k4))/N shown for reference only (not used by the
+  scan), with LEC reference lines.
 
 To decide which radius is optimal, compare the summary PDFs across
 `r15/r20/r25/r30` for a fixed category and exposure -- look at how the q
