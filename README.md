@@ -11,7 +11,7 @@ code/
 │               #   helperFunctions.C (shared), multichannel.C, qWeighted.C, qWeightedSeparate.C,
 │               #   LEC.C, binomialMask.C, run_thr0p1.C, rebinDistributions.C, scanCoverage.C,
 │               #   q1MaskGif.C, qAppletExport.C, hduPlotter.C
-├── python/     # rates.py (rates from txts/ -> results/rates/rates.pdf), qApplet.py, make_presentation.py
+├── python/     # rates.py (rates from txts/ -> results/rates/rates.pdf), qApplet.py
 │               # run them from inside python/
 ├── configs/    # *.yaml: config.yaml (OHDUs, masks, input files), qweighted_cfg, qapplet_cfg, gif_cfg
 ├── scripts/    # shell launchers: run_qweighted_scan.sh, run_qweighted_separate_scan.sh, run_qapplet.sh
@@ -20,8 +20,7 @@ code/
 │   ├── multichannel/r{15,20,25,30}/
 │   ├── qweighted/<run>/          # qWeighted.C, one dir per (radius, w2, w3)
 │   ├── qweighted_separate/<run>/
-│   ├── qapplet/                  # qAppletExport.C output for qApplet.py
-│   └── legacy/                   # multichannel_r30_coarse/ (pre-radius-scan run)
+│   └── qapplet/                  # qAppletExport.C output for qApplet.py
 ├── root/       # .root histograms (threshold=0.1 pass), same layout as txts/
 ├── gifs/       # q1MaskGif.C animations
 ├── results/    # PDFs only
