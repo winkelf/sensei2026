@@ -282,7 +282,10 @@ bool isInsideCircle(int r, int xcenter, int ycenter, int x, int y) {
 }
 
 
-std::pair<std::vector<std::vector<int>>, std::vector<std::vector<int>>> loadImage3(std::string fileName, int quadrant) {
+// keepBits selects which calPixTree mask bits make a pixel enter the mask
+// matrix (with its full bit pattern preserved). The default is the standard
+// SENSEI set used by qWeighted*.C; LEC.C adds the LEC bit (8192) on top.
+std::pair<std::vector<std::vector<int>>, std::vector<std::vector<int>>> loadImage3(std::string fileName, int quadrant, int keepBits = 0x56FC) {
 
   const char* c_fileName = fileName.c_str();
 
@@ -346,7 +349,7 @@ std::pair<std::vector<std::vector<int>>, std::vector<std::vector<int>>> loadImag
   // Build mask cache
   ////////////////////////////////////////////////////////////
 
-  const int PREEXISTING_MASK_BITS = 0x56FC;
+  const int PREEXISTING_MASK_BITS = keepBits;
   std::map<std::pair<int,int>, std::vector<PixelInfo>> maskCache;
   
   Long64_t nPixels = calPixTree->GetEntries();
@@ -457,11 +460,11 @@ std::pair<std::vector<std::vector<int>>, std::vector<std::vector<int>>> loadImag
     // Fill mask overlay
     ////////////////////////////////////////////////////////////
 
-    cout<<n1e << " 1 electron events" <<endl;
-    cout<<n2e << " 2 electron events" <<endl;
-    cout<<n3e << " 3 electron events" <<endl;
-    cout<<n4e << " 4 electron events" <<endl;
-    cout<<n5e << " 5 electron events" <<endl;
+    //cout<<n1e << " 1 electron events" <<endl;
+    //cout<<n2e << " 2 electron events" <<endl;
+    //cout<<n3e << " 3 electron events" <<endl;
+    //cout<<n4e << " 4 electron events" <<endl;
+    //cout<<n5e << " 5 electron events" <<endl;
 
     auto it = maskCache.find({LTA, OHDU});
 

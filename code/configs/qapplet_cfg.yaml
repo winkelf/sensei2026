@@ -1,0 +1,10 @@
+# Which quadrant to export for qApplet.py, and at what q1 cut.
+input_file: "/home/fwinkel/Desktop/SENSEI/work2026/inputs/hits_corr_proc_skp_sensei_2026-03-17_run8_135K_sciencerun_commissioning_NROW520_NBINROW1_NCOL3200_NBINCOL1_EXPOSURE216000_11_522.root"
+
+ohdu: 3
+
+# q1 = k1/N cut used to flag windows as masked (same operating point as the
+# threshold=0.1 diagnostic pass in multichannel.C / run_thr0p1.C).
+threshold: 0.1
+
+output_dir: "../txts/qapplet"

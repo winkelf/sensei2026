@@ -99,8 +99,8 @@ int scanCoverage(string fileName, int ohdu){
   h1->Draw("COLZ");
   h2->Draw("BOX SAME");
 
-  gSystem->mkdir("./results/pdfs", true);
-  string outName = "./results/pdfs/scanCoverage_lta" + to_string(lta) + "_ohdu" + to_string(ohdu) + ".png";
+  gSystem->mkdir("../results/diagnostics", true);
+  string outName = "../results/diagnostics/scanCoverage_lta" + to_string(lta) + "_ohdu" + to_string(ohdu) + ".pdf";
   c->SaveAs(outName.c_str());
 
   return 0;

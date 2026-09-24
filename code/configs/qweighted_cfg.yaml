@@ -1,0 +1,4 @@
+# Weights for the combined statistic used by qWeighted.C:
+#   q = (k1 + w2*k2 + w3*(k3 + k4 + k5)) / N
+w2: 10000.0
+w3: 1.0

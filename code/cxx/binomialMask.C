@@ -7,6 +7,7 @@
 #include <random>
 #include <cmath>
 #include "TCanvas.h"
+#include "TSystem.h"
 #include "TTree.h"
 #include "TH2D.h"
 #include "TH1D.h"
@@ -247,7 +248,7 @@ int binomialMask(){
   gStyle->SetTitleFontSize(0.025);
 
   // input files
-  YAML::Node configFile = YAML::LoadFile("../config/config.yaml");
+  YAML::Node configFile = YAML::LoadFile("../configs/config.yaml");
   vector<string> inputFiles = configFile["input_files"].as<vector<string>>();
   vector<int>    ohdus      = configFile["ohdus"]      .as<vector<int>>();
   vector<int>    maskList   = configFile["mask_list"]  .as<vector<int>>();
@@ -363,9 +364,10 @@ int binomialMask(){
   cout << " "<<  endl;
 
   // output txt to plot with python
-  std::ofstream outFile0("./txts/more_survElec.txt");
-  std::ofstream outFile1("./txts/more_survPix.txt");
-  std::ofstream outFile2("./txts/more_rates.txt");
+  gSystem->mkdir("../txts/binomialMask", true);
+  std::ofstream outFile0("../txts/binomialMask/more_survElec.txt");
+  std::ofstream outFile1("../txts/binomialMask/more_survPix.txt");
+  std::ofstream outFile2("../txts/binomialMask/more_rates.txt");
 
   if (!outFile0) { cerr << "Error opening file for writing!" << endl; }
   if (!outFile1) { cerr << "Error opening file for writing!" << endl; }

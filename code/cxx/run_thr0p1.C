@@ -138,7 +138,7 @@ int run_thr0p1(){
   gStyle->SetFrameLineColor(kWhite);
   gStyle->SetTitleFontSize(0.025);
 
-  YAML::Node configFile = YAML::LoadFile("../config/config.yaml");
+  YAML::Node configFile = YAML::LoadFile("../configs/config.yaml");
   vector<string> inputFiles = configFile["input_files"].as<vector<string>>();
 
   cout<<"==================================================================================================================================================================================="<<endl;
@@ -183,17 +183,17 @@ int run_thr0p1(){
     }
   }
 
-  canvasMaker(hN,  "Distribution of N",      "./results/pdfs/hN_thr0p1.pdf");
-  canvasMaker(hK1, "Distribution of k_{1}",  "./results/pdfs/k1_thr0p1.pdf");
-  canvasMaker(hK2, "Distribution of k_{2}",  "./results/pdfs/k2_thr0p1.pdf");
-  canvasMaker(hK3, "Distribution of k_{3}",  "./results/pdfs/k3_thr0p1.pdf");
-  canvasMaker(hK4, "Distribution of k_{4+}", "./results/pdfs/k4_thr0p1.pdf");
-  canvasMaker(hQ1, "q = #frac{k_{1}}{N}",    "./results/pdfs/q_statistic_1e_thr0p1.pdf");
-  canvasMaker(hQ2, "q = #frac{k_{2}}{N}",    "./results/pdfs/q_statistic_2e_thr0p1.pdf");
-  canvasMaker(hQ3, "q = #frac{k_{3}}{N}",    "./results/pdfs/q_statistic_3e_thr0p1.pdf");
-  canvasMaker(hQ4, "q = #frac{k_{4+}}{N}",   "./results/pdfs/q_statistic_4e_thr0p1.pdf");
+  canvasMaker(hN,  "Distribution of N",      "../results/multichannel/thr0p1_rebinned/hN_thr0p1.pdf");
+  canvasMaker(hK1, "Distribution of k_{1}",  "../results/multichannel/thr0p1_rebinned/k1_thr0p1.pdf");
+  canvasMaker(hK2, "Distribution of k_{2}",  "../results/multichannel/thr0p1_rebinned/k2_thr0p1.pdf");
+  canvasMaker(hK3, "Distribution of k_{3}",  "../results/multichannel/thr0p1_rebinned/k3_thr0p1.pdf");
+  canvasMaker(hK4, "Distribution of k_{4+}", "../results/multichannel/thr0p1_rebinned/k4_thr0p1.pdf");
+  canvasMaker(hQ1, "q = #frac{k_{1}}{N}",    "../results/multichannel/thr0p1_rebinned/q_statistic_1e_thr0p1.pdf");
+  canvasMaker(hQ2, "q = #frac{k_{2}}{N}",    "../results/multichannel/thr0p1_rebinned/q_statistic_2e_thr0p1.pdf");
+  canvasMaker(hQ3, "q = #frac{k_{3}}{N}",    "../results/multichannel/thr0p1_rebinned/q_statistic_3e_thr0p1.pdf");
+  canvasMaker(hQ4, "q = #frac{k_{4+}}{N}",   "../results/multichannel/thr0p1_rebinned/q_statistic_4e_thr0p1.pdf");
 
-  TFile* outRootFile = new TFile("./results/root/multichannel_thr0p1.root", "RECREATE");
+  TFile* outRootFile = new TFile("../root/multichannel/thr0p1_rebinned/multichannel_thr0p1.root", "RECREATE");
   hN ->Write();
   hK1->Write();
   hK2->Write();

@@ -1,35 +1,10 @@
 #include <yaml-cpp/yaml.h>
 #include "helperFunctions.C"
 #include <iostream>
+#include <fstream>
 #include <vector>
-#include <set>
 #include <map>
-#include <algorithm>
-#include <random>
-#include <cmath>
-#include "TCanvas.h"
-#include "TTree.h"
-#include "TH2D.h"
-#include "TH1D.h"
-#include "TRandom3.h"
-#include "TStyle.h"
-#include "TPaveText.h"
-#include "TBox.h"
-#include "TEllipse.h"
-#include "TFile.h"
-#include "TLegend.h"
-#include "TAxis.h"
-#include "TLine.h"
-#include "TMath.h"
-#include "TGraph.h"
-#include "Math/ProbFunc.h"
-#include <fitsio.h>
-#include <iostream>
-#include <vector>
-#include <stdexcept>
-#include <TH2F.h>
-#include <TCanvas.h>
-#include <nlohmann/json.hpp>
+#include "TSystem.h"
 #include <chrono>
 
 using namespace chrono;
@@ -45,6 +20,13 @@ int extractLTA(const string& fileName) {
   return stoi(ltaStr);
 }
 
+// Extract the runId from the same filename pattern.
+int extractRunId(const string& fileName) {
+  size_t dot = fileName.find_last_of('.');
+  size_t lastUnderscore = fileName.find_last_of('_', dot - 1);
+  return stoi(fileName.substr(lastUnderscore + 1, dot - lastUnderscore - 1));
+}
+
 // Only these LTAs/ohdus (the "good quads") are processed; any other LTA is skipped.
 static const map<int, vector<int>> GOOD_QUADS = {
   {3,  {2}},
@@ -58,225 +40,133 @@ static const map<int, vector<int>> GOOD_QUADS = {
   {18, {1, 2, 3}},
 };
 
-vector<int> analyze(vector<int> maskList, float threshold, string fileName, int ohdu, TH1D* hq) {
+// Same standard SENSEI mask bits as qWeighted.C, plus the LEC bit on top.
+// The LEC mask replaces qWeighted's dynamic binomial mask; everything else
+// (image loading, event definition, base mask) is identical so the two
+// jobs are directly comparable.
+static constexpr int PREEXISTING_MASK_BITS = 0x56FC;
+static constexpr int LEC_MASK_BIT          = 8192;
 
-  int n   = 30;
-  float r = n/2;
-  
-  ////////////////////////////////////////////////////////////////////
-  ////////////////////// Get previous masks (only for data) //////////
-  ////////////////////////////////////////////////////////////////////
+// Counts events/pixels of one quadrant that survive
+//   [0..3] the base mask only        (n1, n2, n345, nPix)
+//   [4..7] base mask + LEC mask      (n1, n2, n345, nPix)
+// Events are placed at their barycenter pixel with e truncated to an
+// integer (loadImage3), exactly as in qWeighted.C.
+vector<int> analyzeLEC(string fileName, int ohdu) {
 
-  auto [matrix_data, previousMask] = loadImage2(fileName, ohdu, maskList);
+  auto [matrix_data, mask] = loadImage3(fileName, ohdu, PREEXISTING_MASK_BITS | LEC_MASK_BIT);
 
-  // count unmasked pixels
-  int nUnmaskedPixels = countUnmaskedPixels(previousMask, maskList, true);
-  //cout << "  Number of unmasked pixels: "<< nUnmaskedPixels << endl;
+  int Nx = 3200;
+  int Ny = 520;
 
-  /////////////////////////////////////////////////////////////////////
-  ///////// Counting n-electron events that survived mask /////////////
-  /////////////////////////////////////////////////////////////////////
+  vector<int> out(8, 0);
 
-  //exit(1);
+  for (int x = 0; x < Ny; ++x) {
+    for (int y = 0; y < Nx; ++y) {
 
-  int n1eEventsUnmasked = 0;
-  int n2eEventsUnmasked = 0;
-  int n3eEventsUnmasked = 0;
+      int maskInPixel = mask.at(x).at(y);
 
-  for (int x = 0; x < 520; ++x) {
-    for (int y = 0; y < 3200; ++y) {
-      int event       = matrix_data.at(x).at(y);
-      int maskInPixel = previousMask.at(x).at(y);
-      //if (maskInPixel==8194) continue;
+      // Standard SENSEI masks.
+      if ((maskInPixel & PREEXISTING_MASK_BITS) != 0) continue;
 
-      int isMasked = 0;
+      bool lecMasked = (maskInPixel & LEC_MASK_BIT) != 0;
 
-      for (int m=0; m<maskList.size(); m++) {
-        if ((maskInPixel&maskList.at(m))==maskList.at(m) ) {
-          isMasked += 1;
-        }
-      }
+      out[3] += 1;
+      if (!lecMasked) out[7] += 1;
 
-      if (isMasked!=0){ continue; }
+      int event = matrix_data.at(x).at(y);
+      if (event < 1 || event > 5) continue;
 
-      if (event==1) n1eEventsUnmasked+=1;
-      if (event==2) n2eEventsUnmasked+=1;
-      if (event==3) n3eEventsUnmasked+=1;
+      int idx = (event == 1) ? 0 : (event == 2) ? 1 : 2;
+      out[idx] += 1;
+      if (!lecMasked) out[4 + idx] += 1;
     }
   }
 
-  //exit(1);
-  
-  vector<int> rVector = { n1eEventsUnmasked, n2eEventsUnmasked, n3eEventsUnmasked, nUnmaskedPixels};
-
-  return rVector;
+  return out;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////                Main           /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////                Main           /////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Config: ../configs/config.yaml (input_files)
+//
+// LEC is a fixed static mask, so there is no threshold scan: one pass over
+// the GOOD_QUADS images. Output in ../txts/lec/:
+//   LEC_perImage.txt  one row per (file, ohdu)
+//   LEC_survElec.txt / LEC_survPix.txt / LEC_rates.txt  totals, same
+//   column layout as qWeighted.C's (single row, threshold column = 0)
 int LEC(){
 
-  // Make list of thresholds/cut values to loop over	
-  //vector<float> thresholds = {0.1};
-  vector<float> thresholds = {};
-  //for (float i=0; i<0.01; i+=0.0005) thresholds.push_back(static_cast<float>(i));
-  //for (float i=0; i<0.1; i+=0.005) thresholds.push_back(static_cast<float>(i));
-  //for (float i=0; i<0.05; i+=0.0005) thresholds.push_back(static_cast<float>(i));
-  for (float i=0; i<0.01; i+=0.001) thresholds.push_back(static_cast<float>(i));
-
-  gStyle->SetPadTickX(1);
-  gStyle->SetPadTickY(1);
-  gStyle->SetCanvasColor(kBlack);
-  gStyle->SetFrameFillColor(kBlack);
-  gStyle->SetPadColor(kBlack);
-  gStyle->SetStatColor(kBlack);
-  gStyle->SetOptStat(0);
-  gStyle->SetTitleFillColor(kBlack);
-  gStyle->SetTitleTextColor(kWhite);
-  gStyle->SetLabelColor(kWhite, "XYZ");
-  gStyle->SetTitleColor(kWhite, "XYZ");
-  gStyle->SetOptStat(0);
-  gStyle->SetHistFillColor(kBlack);
-  gStyle->SetHistLineColor(kWhite);
-  gStyle->SetFuncColor(kWhite);
-  gStyle->SetFrameLineColor(kWhite);
-  gStyle->SetTitleFontSize(0.025);
-
-  // input files
-  YAML::Node configFile = YAML::LoadFile("../config/config.yaml");
+  YAML::Node configFile = YAML::LoadFile("../configs/config.yaml");
   vector<string> inputFiles = configFile["input_files"].as<vector<string>>();
-  vector<int>    ohdus      = configFile["ohdus"].as<vector<int>>();
-  vector<int>    maskList   = configFile["mask_list_LEC"].as<vector<int>>();
- 
-  cout<<"-------------------------------------------------------------------------------------------------------------------------------------------------------------------"<<endl;
-  cout<<"             " <<endl; 
-  cout<<"Input files: " <<endl; 
-  for (const auto& file : inputFiles) cout <<"  " <<file << endl;
-  cout<<"             " <<endl; 
-  cout<<"OHDUs: " <<endl; 
-  for (const auto& o : ohdus) cout <<"  " <<o;
-  cout<<"             " <<endl; 
 
-  // Histo
-  TH1D* hq = new TH1D("","Distribution of q = #frac{k}{N}",50,0,.1);
- 
-  // Clock 
+  string outDir = "../txts/lec";
+  gSystem->mkdir(outDir.c_str(), true);
+
+  std::ofstream outPerImage((outDir + "/LEC_perImage.txt").c_str());
+  if (!outPerImage) { cerr << "Error opening file for writing!" << endl; }
+  outPerImage << "#lta\tohdu\trunId"
+              << "\tn1_base\tn2_base\tn345_base\tnPix_base"
+              << "\tn1_LEC\tn2_LEC\tn345_LEC\tnPix_LEC" << endl;
+
   auto a = high_resolution_clock::now();
 
-  vector<float> n1ElectronEventsVec = {};
-  vector<float> n2ElectronEventsVec = {};
-  vector<float> n3ElectronEventsVec = {};
-  vector<float> unmaskedPixelsVec   = {};
-  vector<float> oneElectronRateVec  = {};
-  vector<float> twoElectronRateVec  = {};
-  vector<float> threeElectronRateVec  = {};
-  
-  for (auto wp : thresholds) {
-    cout<<"-------------------------------------------------------------------------------------------------------------------------------------------------------------------"<<endl;
-    cout<<"Threshold = "<< wp <<endl;
-  
-    int nImages = 0;
-    int nImagesInConfig = inputFiles.size();
+  vector<double> tot(8, 0.0);
+  int nImages = 0;
 
-    float n1ElectronEvents = 0;
-    float n2ElectronEvents = 0;
-    float n3ElectronEvents = 0;
-    float unmaskedPixels   = 0;
+  for (const auto& rf : inputFiles) {
 
+    int lta = extractLTA(rf);
+    auto ltaIt = GOOD_QUADS.find(lta);
+    if (ltaIt == GOOD_QUADS.end()) continue;
+    const vector<int>& fileOhdus = ltaIt->second;
 
-    for (const auto& rf : inputFiles) {
-      nImages+=1;
+    int runId = extractRunId(rf);
+    cout<<"  READING FILE: "<< rf << endl;
 
-      cout<<"                                                    "<<endl;
-      cout<<"  READING FILE: "<< nImages << "/"<< nImagesInConfig <<endl;
-      cout<<"                "<< rf                               <<endl;
+    for (int ohdu : fileOhdus) {
+      vector<int> c = analyzeLEC(rf, ohdu);
+      nImages += 1;
 
-      int lta = extractLTA(rf);
-      auto ltaIt = GOOD_QUADS.find(lta);
-      if (ltaIt == GOOD_QUADS.end()) {
-        cout<<"                   *skipping LTA "<< lta <<" (not in GOOD_QUADS)"<<endl;
-        continue;
-      }
-      const vector<int>& fileOhdus = ltaIt->second;
+      outPerImage << lta << "\t" << ohdu << "\t" << runId;
+      for (int v : c) outPerImage << "\t" << v;
+      outPerImage << endl;
 
-      for (int oh=0; oh<fileOhdus.size(); oh++){
-        int ohdu = fileOhdus.at(oh);
+      for (int k = 0; k < 8; ++k) tot[k] += c[k];
 
-        cout<<"                   *ohdu "<< ohdu << endl;
-
-        vector<int> qs  = analyze(maskList, wp, rf, ohdu, hq);
-        
-        cout<<"                      - Number of 1 electron events "<< qs.at(0) << endl;
-        cout<<"                      - Number of 2 electron events "<< qs.at(1) << endl;
-        cout<<"                      - Number of unmasked pixels   "<< qs.at(2) << endl;
-        n1ElectronEvents += qs.at(0);
-        n2ElectronEvents += qs.at(1);
-        n2ElectronEvents += qs.at(2);
-        unmaskedPixels   += qs.at(3);
-      }	      
-    //  if (nImages>120) break;
+      cout<<"                   *ohdu "<< ohdu
+          <<"  base: "<< c[0] <<"/"<< c[1] <<"/"<< c[2] <<" pix "<< c[3]
+          <<"   LEC: "<< c[4] <<"/"<< c[5] <<"/"<< c[6] <<" pix "<< c[7] << endl;
     }
-
-    cout<<"                      - Number of 1 electron events "<< n1ElectronEvents << endl;
-    cout<<"                      - Number of 2 electron events "<< n2ElectronEvents << endl;
-    cout<<"                      - Number of unmasked pixels   "<< unmaskedPixels   << endl;
-    //exit(1);
-
-    n1ElectronEventsVec.push_back( n1ElectronEvents                );
-    n2ElectronEventsVec.push_back( n2ElectronEvents                );
-    n3ElectronEventsVec.push_back( n3ElectronEvents                );
-    unmaskedPixelsVec  .push_back( unmaskedPixels                  );
-    oneElectronRateVec .push_back( n1ElectronEvents/unmaskedPixels );
-    twoElectronRateVec .push_back( n2ElectronEvents/unmaskedPixels );
-    threeElectronRateVec .push_back( n3ElectronEvents/unmaskedPixels );
   }
+  outPerImage.close();
 
-
-  // output txt to plot with python
-  std::ofstream outFile0("./txts/LEC_survElec.txt");
-  std::ofstream outFile1("./txts/LEC_survPix.txt");
-  std::ofstream outFile2("./txts/LEC_rates.txt");
+  std::ofstream outFile0((outDir + "/LEC_survElec.txt").c_str());
+  std::ofstream outFile1((outDir + "/LEC_survPix.txt").c_str());
+  std::ofstream outFile2((outDir + "/LEC_rates.txt").c_str());
 
   if (!outFile0) { cerr << "Error opening file for writing!" << endl; }
   if (!outFile1) { cerr << "Error opening file for writing!" << endl; }
   if (!outFile2) { cerr << "Error opening file for writing!" << endl; }
 
-
-  for (size_t t = 0; t < thresholds.size(); ++t) {
-    outFile0 << thresholds.at(t) <<"\t" << n1ElectronEventsVec.at(t) << "\t" << n2ElectronEventsVec.at(t) << "\t" << n3ElectronEventsVec.at(t) <<endl;
-    outFile1 << thresholds.at(t) <<"\t" << unmaskedPixelsVec.  at(t) << "\t" << unmaskedPixelsVec.  at(t) << "\t" << unmaskedPixelsVec.  at(t) <<endl;
-    outFile2 << thresholds.at(t) <<"\t" << oneElectronRateVec. at(t) << "\t" << twoElectronRateVec. at(t) << "\t" << threeElectronRateVec. at(t) <<endl;
-  }
+  outFile0 << 0 << "\t" << tot[4] << "\t" << tot[5] << "\t" << tot[6] << endl;
+  outFile1 << 0 << "\t" << tot[7] << endl;
+  outFile2 << 0 << "\t" << tot[4]/tot[7] << "\t" << tot[5]/tot[7] << "\t" << tot[6]/tot[7] << endl;
 
   outFile0.close();
   outFile1.close();
   outFile2.close();
 
-  //TCanvas* c0 = new TCanvas();
-
-  //c0->SetFillColor(kBlack);
-  //c0->SetBatch(kTRUE);
-  //hq->SetStats(0);
-  //hq->GetXaxis()->SetTitle("q = #frac{k}{N}");
-  //hq->GetYaxis()->SetTitle("Number of entries");
-  //hq->GetYaxis()->SetAxisColor(kWhite);
-  //hq->GetXaxis()->SetAxisColor(kWhite);
-  ////hq->Scale(1/hq->Integral("width"));
-  //hq->Draw("HIST");
-  //c0->SetLogy();
-  //c0->SaveAs("q_statistic.pdf");
-
-  // chrono
   auto b = high_resolution_clock::now();
   cout << " "<<  endl;
-  cout << " "<<  endl;
   cout << "================== "<<  endl;
+  cout << nImages << " images" << endl;
+  cout << "Base mask:       n1 "<< tot[0] <<"  n2 "<< tot[1] <<"  n345 "<< tot[2] <<"  pix "<< tot[3] << endl;
+  cout << "Base + LEC mask: n1 "<< tot[4] <<"  n2 "<< tot[5] <<"  n345 "<< tot[6] <<"  pix "<< tot[7] << endl;
   cout << "Took " << duration_cast<seconds>(b - a).count() << " seconds" <<  endl;
   cout << "================== "<<  endl;
-  cout << " "<<  endl;
-  cout << " "<<  endl;
 
   return 0;
 }

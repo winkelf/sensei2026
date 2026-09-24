@@ -2,3 +2,6 @@
 *_C.so
 *_C.d
 *_C_ACLiC_dict_rdict.pcm
+
+# job logs written by code/scripts/*.sh
+code/logs/

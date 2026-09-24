@@ -42,10 +42,10 @@ static constexpr int PREEXISTING_MASK_BITS = 0x56FC;
 //   - windows newly cut by the current q1 threshold, in violet
 //
 // The quadrant (input_file/ohdu) and the reference histogram source
-// (q1_root_file/q1_hist_name) are read from ../config/config_gif.yaml.
+// (q1_root_file/q1_hist_name) are read from ../configs/gif_cfg.yaml.
 int q1MaskGif(){
 
-  YAML::Node configFile = YAML::LoadFile("../config/gif_cfg.yaml");
+  YAML::Node configFile = YAML::LoadFile("../configs/gif_cfg.yaml");
   string fileName    = configFile["input_file"]  .as<string>();
   int    ohdu        = configFile["ohdu"]        .as<int>();
   string q1RootFile  = configFile["q1_root_file"].as<string>();
@@ -103,8 +103,8 @@ int q1MaskGif(){
     0.005f, 0.006f, 0.007f, 0.008f, 0.009f
   };
 
-  gSystem->mkdir("./gif", true);
-  string outGif = "./gif/q1_mask_lta" + to_string(lta) + "_ohdu" + to_string(ohdu) + ".gif";
+  gSystem->mkdir("../gifs", true);
+  string outGif = "../gifs/q1_mask_lta" + to_string(lta) + "_ohdu" + to_string(ohdu) + ".gif";
   gSystem->Unlink(outGif.c_str());
 
   // Pre-existing SENSEI mask overlay: same for every frame, so build it

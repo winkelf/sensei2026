@@ -22,6 +22,7 @@
 #include "TLine.h"
 #include "TMath.h"
 #include "TGraph.h"
+#include "TSystem.h"
 #include "Math/ProbFunc.h"
 #include <fitsio.h>
 #include <iostream>
@@ -83,10 +84,11 @@ vector<int> analyze(float threshold,
                     TH1D* hN,
                     TH1D* h_k1,
                     TH1D* h_k2,
-                    TH1D* h_k3) {
+                    TH1D* h_k3,
+                    int radius) {
 
-  int n   = 60;
-  float r = n/2;
+  int n   = 2*radius;
+  float r = radius;
 
   ////////////////////////////////////////////////////////////////////
   ////////////////////// Get previous masks (only for data) //////////
@@ -254,13 +256,13 @@ vector<int> analyze(float threshold,
 ////////////////////////////////////////////                Main           /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int multichannel(){
+int multichannel(int radius = 30){
 
   // Make list of thresholds/cut values to loop over
   //vector<float> thresholds = {0.1};
   vector<float> thresholds = {};
-  //for (float i=0; i<0.01; i+=0.0005) thresholds.push_back(static_cast<float>(i));
-  for (float i=0; i<0.01; i+=0.001) thresholds.push_back(static_cast<float>(i));
+  //for (float i=0; i<0.01; i+=0.001) thresholds.push_back(static_cast<float>(i));
+  for (float i=0; i<0.01; i+=0.001/3) thresholds.push_back(static_cast<float>(i));
 
   gStyle->SetPadTickX(1);
   gStyle->SetPadTickY(1);
@@ -281,7 +283,7 @@ int multichannel(){
   gStyle->SetTitleFontSize(0.025);
 
   // input files
-  YAML::Node configFile = YAML::LoadFile("../config/config.yaml");
+  YAML::Node configFile = YAML::LoadFile("../configs/config.yaml");
   vector<string> inputFiles = configFile["input_files"].as<vector<string>>();
   vector<int>    ohdus      = configFile["ohdus"]      .as<vector<int>>();
 
@@ -294,6 +296,8 @@ int multichannel(){
   cout<<"             " <<endl;
   cout<<"OHDUs: " <<endl;
   for (const auto& o : ohdus) cout <<"  " <<o;
+  cout<<"             " <<endl;
+  cout<<"Radius: "<<radius<<endl;
   cout<<"             " <<endl;
   cout<<"==================================================================================================================================================================================="<<endl;
   cout<<"==================================================================================================================================================================================="<<endl;
@@ -366,7 +370,7 @@ int multichannel(){
 
         cout<<"                   *ohdu "<< ohdu << endl;
 
-        vector<int> qs = analyze(wp, rf, ohdu, hq_1e, hq_2e, hq_3e, hq_4e, hN, h_k1, h_k2, h_k3);
+        vector<int> qs = analyze(wp, rf, ohdu, hq_1e, hq_2e, hq_3e, hq_4e, hN, h_k1, h_k2, h_k3, radius);
 
         cout<<"                      - Number of 1 electron events " << qs.at(0) << endl;
         cout<<"                      - Number of 2 electron events " << qs.at(1) << endl;
@@ -420,9 +424,17 @@ int multichannel(){
   cout << " "<<  endl;
 
   // output txt to plot with python
-  std::ofstream outFile0("./txts/more_survElec.txt");
-  std::ofstream outFile1("./txts/more_survPix.txt");
-  std::ofstream outFile2("./txts/more_rates.txt");
+  string outTag = "multichannel/r" + to_string(radius);
+  string txtDir  = "../txts/"    + outTag;
+  string pdfDir  = "../results/" + outTag;
+  string rootDir = "../root/"    + outTag;
+  gSystem->mkdir(txtDir.c_str(), true);
+  gSystem->mkdir(pdfDir.c_str(), true);
+  gSystem->mkdir(rootDir.c_str(), true);
+
+  std::ofstream outFile0((txtDir + "/more_survElec.txt").c_str());
+  std::ofstream outFile1((txtDir + "/more_survPix.txt").c_str());
+  std::ofstream outFile2((txtDir + "/more_rates.txt").c_str());
 
   if (!outFile0) { cerr << "Error opening file for writing!" << endl; }
   if (!outFile1) { cerr << "Error opening file for writing!" << endl; }
@@ -493,20 +505,20 @@ int multichannel(){
 
       analyze(extraThreshold, rf, ohdu,
               hq_1e_01, hq_2e_01, hq_3e_01, hq_4e_01,
-              hN_01, h_k1_01, h_k2_01, h_k3_01);
+              hN_01, h_k1_01, h_k2_01, h_k3_01, radius);
     }
   }
 
-  canvasMaker(hN_01,    "Distribution of N",     "./pdfs/hN_thr0p1.pdf");
-  canvasMaker(h_k1_01,  "Distribution of k_{1}", "./pdfs/k1_thr0p1.pdf");
-  canvasMaker(h_k2_01,  "Distribution of k_{2}", "./pdfs/k2_thr0p1.pdf");
-  canvasMaker(h_k3_01,  "Distribution of k_{3}", "./pdfs/k3_thr0p1.pdf");
-  canvasMaker(hq_1e_01, "q = #frac{k_{1}}{N}",   "./pdfs/q_statistic_1e_thr0p1.pdf");
-  canvasMaker(hq_2e_01, "q = #frac{k_{2}}{N}",   "./pdfs/q_statistic_2e_thr0p1.pdf");
-  canvasMaker(hq_3e_01, "q = #frac{k_{3}}{N}",   "./pdfs/q_statistic_3e_thr0p1.pdf");
-  canvasMaker(hq_4e_01, "q = #frac{k_{4}}{N}",   "./pdfs/q_statistic_4e_thr0p1.pdf");
+  canvasMaker(hN_01,    "Distribution of N",     (pdfDir + "/hN_thr0p1.pdf").c_str());
+  canvasMaker(h_k1_01,  "Distribution of k_{1}", (pdfDir + "/k1_thr0p1.pdf").c_str());
+  canvasMaker(h_k2_01,  "Distribution of k_{2}", (pdfDir + "/k2_thr0p1.pdf").c_str());
+  canvasMaker(h_k3_01,  "Distribution of k_{3}", (pdfDir + "/k3_thr0p1.pdf").c_str());
+  canvasMaker(hq_1e_01, "q = #frac{k_{1}}{N}",   (pdfDir + "/q_statistic_1e_thr0p1.pdf").c_str());
+  canvasMaker(hq_2e_01, "q = #frac{k_{2}}{N}",   (pdfDir + "/q_statistic_2e_thr0p1.pdf").c_str());
+  canvasMaker(hq_3e_01, "q = #frac{k_{3}}{N}",   (pdfDir + "/q_statistic_3e_thr0p1.pdf").c_str());
+  canvasMaker(hq_4e_01, "q = #frac{k_{4}}{N}",   (pdfDir + "/q_statistic_4e_thr0p1.pdf").c_str());
 
-  TFile* outRootFile = new TFile("./root/multichannel_thr0p1.root", "RECREATE");
+  TFile* outRootFile = new TFile((rootDir + "/multichannel_thr0p1.root").c_str(), "RECREATE");
   hN_01   ->Write();
   h_k1_01 ->Write();
   h_k2_01 ->Write();

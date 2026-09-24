@@ -7,37 +7,44 @@ statistics ("q-statistic"), and rate plots comparing masking strategies.
 
 ```
 code/
-├── config/         # config.yaml — OHDUs, pixel mask bitmasks, and input .root file lists
-│                   # config_test.yaml, gif_cfg.yaml — inputs for the test/gif macros below
-├── cxx/            # ROOT (C++) analysis macros
-│   ├── helperFunctions.C  # shared utilities included by the macros below
-│   ├── LEC.C               # "Local Event Cut" masking analysis
-│   ├── multichannel.C      # multi-channel/multi-OHDU analysis (full threshold scan +
-│   │                       # threshold=0.1 diagnostic pass, writes to txts/ and results/)
-│   ├── binomialMask.C      # binomial pixel-mask analysis
-│   ├── hduPlotter.C        # per-HDU plotting helper
-│   ├── multichannel_test.C, LEC_test.C  # per-LTA/OHDU dev variants (config_test.yaml)
-│   ├── run_thr0p1.C        # standalone rerun of the threshold=0.1 diagnostic pass
-│   ├── scanCoverage.C      # visualizes sliding-window scan coverage for one quadrant
-│   ├── q1MaskGif.C         # animates the q1 masking cut across thresholds (config: gif_cfg.yaml)
-│   ├── txts/                # rate/survival tables (more_*.txt, LEC_*.txt) produced by the macros
-│   ├── results/              # consolidated pdfs/, root/, and txts/ output of the macros above
-│   └── gif/                  # animated gif output of q1MaskGif.C
-├── plots/          # rendered outputs
-│   ├── pngs/, pngs_2023/   # per-LTA/OHDU exposure maps (with nolec/wbinom/wlec variants)
-│   └── qdistro/             # q-statistic distributions by exposure (0/72000/216000) and window
-└── python/         # rates.py — final rate/upper-limit summary plot (rates.pdf) from the .txt tables
+├── cxx/        # ROOT (C++) macros only — run them from inside cxx/
+│               #   helperFunctions.C (shared), multichannel.C, qWeighted.C, qWeightedSeparate.C,
+│               #   LEC.C, binomialMask.C, run_thr0p1.C, rebinDistributions.C, scanCoverage.C,
+│               #   q1MaskGif.C, qAppletExport.C, hduPlotter.C
+├── python/     # rates.py (rates from txts/ -> results/rates/rates.pdf), qApplet.py, make_presentation.py
+│               # run them from inside python/
+├── configs/    # *.yaml: config.yaml (OHDUs, masks, input files), qweighted_cfg, qapplet_cfg, gif_cfg
+├── scripts/    # shell launchers: run_qweighted_scan.sh, run_qweighted_separate_scan.sh, run_qapplet.sh
+├── txts/       # tables written by the macros, read by python/
+│   ├── lec/                      # LEC.C (rewritten 2026-09-22, same loader/mask as qWeighted)
+│   ├── multichannel/r{15,20,25,30}/
+│   ├── qweighted/<run>/          # qWeighted.C, one dir per (radius, w2, w3)
+│   ├── qweighted_separate/<run>/
+│   ├── qapplet/                  # qAppletExport.C output for qApplet.py
+│   └── legacy/                   # multichannel_r30_coarse/ (pre-radius-scan run)
+├── root/       # .root histograms (threshold=0.1 pass), same layout as txts/
+├── gifs/       # q1MaskGif.C animations
+├── results/    # PDFs only
+│   ├── rates/                    # rates.pdf from python/rates.py (qWeighted vs LEC)
+│   ├── multichannel/r{15,..,30}/, thr0p1_rebinned/
+│   ├── qweighted/<run>/, early_test_r15_w1/
+│   ├── qweighted_separate/<run>/
+│   ├── diagnostics/              # scanCoverage
+│   └── early_exploration/        # exposure maps and q distributions from the first studies
+└── logs/       # (gitignored) job logs from scripts/
 ```
+
+Macros write to `../txts/<study>/`, `../results/<study>/` and `../root/<study>/`.
 
 ## Pipeline
 
-1. `config/config.yaml` defines which OHDUs, pixel masks (neighbor, bleed, halo,
+1. `configs/config.yaml` defines which OHDUs, pixel masks (neighbor, bleed, halo,
    crosstalk, edge, hot pixel/column, LEC, etc.), and input `.root` files to use.
 2. The ROOT macros in `cxx/` (`LEC.C`, `multichannel.C`, `binomialMask.C`) process
    the hit data, apply the configured masks, and write survival/rate tables to
-   `cxx/txts/` plus diagnostic PDFs and root files under `cxx/results/`.
-3. `python/rates.py` reads the `more_*.txt` / `LEC_*.txt` tables and produces the
-   summary rate plot (`rates.pdf`).
+   `txts/`, with diagnostic PDFs under `results/` and root files under `root/`.
+3. `python/rates.py` reads the qWeighted and LEC tables in `txts/` and produces
+   `results/rates/rates.pdf`.
 4. `run_thr0p1.C`, `scanCoverage.C`, and `q1MaskGif.C` are diagnostic tools built on
    top of that pipeline: rerunning just the threshold=0.1 pass, visualizing sliding-window
    scan coverage, and animating how the q1 masking cut evolves across thresholds.
