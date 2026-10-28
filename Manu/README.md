@@ -1,150 +1,123 @@
 # Manu
 
-ROOT (C++) macros for a circular-window multi-electron rate study: for each
-detector image (RUNID/LTA/OHDU), a grid of overlapping circular windows is
-laid over the sensor, and for every window we count how many reconstructed
-hits have exactly 1, 2, 3, or 4+ electrons (`k1`-`k4`), normalized by the
-number of valid (unmasked) background pixels in that window (`N`). The study
-is run separately for two quad-quality selections (`good_quads`,
-`notbad_quads`), across several window radii (to compare which mask size
-gives the most stable rate estimate), and across exposures (to see whether
-mask performance changes with exposure time).
+ROOT (C++) macros for a circular-window multi-electron study. For each
+detector image (RUNID/LTA/OHDU) a grid of overlapping circular windows
+(radius r, centres every r pixels) is laid over the sensor, and for every
+window we count the reconstructed hits with exactly 1, 2, 3 or 4+ electrons
+(`k1`-`k4`) and the number of live (unmasked) pixels (`N`); `q_i = k_i/N`.
+The study is run for two quad selections (`good_quads`, `notbad_quads`); the
+current plots all use r = 30.
+
+## Workflow
+
+Each dataset lives in its own folder with its own `config.yaml`; all outputs
+are written inside that folder, so datasets never overwrite each other.
+
+```
+./run_dataset.sh <dataset_folder>                 # all stages
+./run_dataset.sh <dataset_folder> scan lec rates  # only some stages
+```
+
+| stage | macro | output |
+|---|---|---|
+| `scan` | `MaskScanManye.C` | `windows` trees, standard mask (0x56FC) |
+| `lec` | `MaskScanManyeLEC.C` | `windows` trees with the LEC bit (0x2000) added, in `<quads>/lec/` |
+| `rates` | `ImageRates.C` | per-image live pixels and hit counts n1-n4, in `imagerates/` |
+| `plots` | `PlotK2EqualsTwo.C`, `PlotQScenarios.C`, `PlotK1Independence.C` | the r = 30 PDFs |
+
+The generation stages skip any output file that already exists, so an
+interrupted run can simply be restarted. Afterwards:
+
+```
+root -l -b -q K1ClosureTest.C   # closure test of the independence method (from a dataset folder)
+python3 merge_results.py        # one summary PDF per dataset and quad selection, in summary/<quads>/
+```
 
 ## Files
 
-- `MaskScanManye.C` -- the data-generation macro. Reads `hitSumm`/`calPixTree`
-  from each input file, builds the per-detector pixel mask, scans the window
-  grid, and writes one small `windows` TTree per (category, exposure, radius,
-  input file) with branches `runID, LTA, OHDU, x, y, N, k1-k4, r1-r4, radius,
-  exposure`.
-- `PlotWindowStats.C` -- the plotting macro. Chains together the `windows`
-  trees MaskScanManye.C wrote and produces summary PDFs. It only reads the
-  small per-window trees, not the original hit data, so it's fast and can be
-  re-run any time without redoing the analysis. It auto-discovers every
-  `e<exposure>/r<radius>` combination present on disk, so it doesn't need to
-  read `config.yaml` at all.
-- `MaskScanManyeLEC.C` -- runs the same category x exposure x radius x file
-  scan as `MaskScanManye.C`, but with the LEC ("Local Event Cut") pixel-mask
-  bit (0x2000) added on top of the standard mask, writing to
-  `<category>/lec/e<exposure>/r<radius>/`. This gives a single (k1-k4, N)
-  reference per combination to compare against a q1 cut on the standard-mask
-  output -- see `PlotQ1CutScan.C`. `#include`s `MaskScanManye.C` to reuse its
-  types/helpers/`windowStudy()`, and only defines its own `MaskScanManyeLEC()`
-  entry point, so running it doesn't touch or require the standard-mask
-  output.
-- `PlotQ1CutScan.C` -- for each (category, exposure, radius) and for each
-  channel i in {1,2,3,4} **independently** (no weighting), scans a q_i =
-  k_i/N cut from 0 up to `min(kMaxQCut, highest observed q_i)` (a small,
-  hand-tuned cap so the region where the curve crosses its LEC reference is
-  visible instead of squashed by the full data range), keeping only windows
-  with q_i < cut at each step. Produces two PDFs per combination:
-  - `qcut_scan_summary_*.pdf` -- k_i, N ("living pixels" kept, one curve per
-    channel since each channel's cut admits a different set of windows), and
-    q_i = k_i/N, each of the 4 channels vs. its own cut, with LEC reference
-    lines from `MaskScanManyeLEC.C`'s output, so you can see directly
-    whether tightening a channel's q cut can match what the LEC mask
-    achieves for that channel.
-  - `qcut_distribution_*.pdf` -- a safety-check histogram (log-x) of the
-    full q1-q4 distributions (unweighted, matching the scan) plus, for
-    reference only, a weighted-combined distribution q = (k1 + 5*k2 +
-    10*(k3+k4))/N (not used by the scan itself), all with LEC reference
-    lines.
+Data generation
+- `MaskScanManye.C` -- builds the per-image pixel mask from `calPixTree`,
+  scans the window grid and writes one small `windows` tree per (quads,
+  exposure, radius, input file): `runID, LTA, OHDU, x, y, N, k1-k4, r1-r4,
+  radius, exposure, maskBits`. Windows with N = 0 are not stored.
+- `MaskScanManyeLEC.C` -- the same scan with the LEC mask bit (0x2000) added,
+  the reference for the q-cut scans.
+- `ImageRates.C` -- per image: live pixels `Npix` and hits `n1-n4` on live
+  pixels (window sums can't be used because windows overlap).
 
-  `#include`s `PlotWindowStats.C` to reuse its helpers.
-- `config.yaml` -- defines the quad selections, radii to scan, and input
-  files grouped by exposure. **Edit `exposures` to point at your own local
-  copy of the data** before running -- the paths shipped here are
+Plots (all read only the small `windows` trees, so they run in seconds)
+- `PlotK2EqualsTwo.C` -- distributions of N, k and q for all windows (no cut)
+  and for the selections k2 = 1, k2 = 2 and k3+ = 1 (k3+ = k3 + k4).
+- `PlotQScenarios.C` -- q1-q4 distributions for no cut and k2 < 2 (log axis,
+  q = 0 counted separately), and the independent per-channel q_i cut scans
+  with the LEC reference lines.
+- `PlotK1Independence.C` -- independence tests: the k1 (or k2) distribution of
+  windows passing a tag (k2 >= 1, or k3+ = 1) against the expectation from
+  independence, where each window contributes p = 1 - exp(-N lambda) (at least
+  one) or N lambda exp(-N lambda) (exactly one), lambda = image rate of the
+  tagging hits. Includes the ratio, chi2, and P(tag) vs the tested count.
+- `K1ClosureTest.C` -- closure test of that method: in images with no 2e hit,
+  fake 2e hits are placed uniformly on live pixels at the real rate and the
+  same test is run (20 toys), plus a calibration page (p-values, pulls).
+- `PlotWindowStats.C` -- shared helpers (`buildChain`,
+  `discoverTaggedSubdirs`) used by the plotting macros.
+- `PlotStyle.C` -- shared plot style (fonts, colours per charge: 1e grey,
+  2e blue, 3e orange, 4e+ aqua), legends, headers and PDF page cropping.
+- `PlotQ1CutScan.C` -- older q-cut scan with weighted combinations, replaced
+  by `PlotQScenarios.C`; kept for reference.
+
+Window-flag masks
+- `BuildFlagMasks.C` -- writes a full copy of every input file (inputs are
+  never modified) with three new mask bits in `calPixTree`'s `mask`, set on
+  every pixel of a flagged r = 30 window (standard mask 0x56FC):
+
+  | bit | flag | window flagged if |
+  |---|---|---|
+  | 0x100000 | A | k2 >= 2, or k2 = 1 and k1 >= 2 |
+  | 0x200000 | B | k2 >= 2, or k2 = 1 and k1 >= 3 |
+  | 0x400000 | C | k2 >= 2, or k2 = 1 and k1 >= 5 |
+
+  `hitSumm` keeps its `flag` (OR of the masks of the event's pixels) and gets
+  `flagA`, `flagB`, `flagC` = `flag` plus that flag's bit if any pixel of the
+  event carries it. The copy also has `flagWindows` (the flagged windows) and
+  `flagSummary` (per-image counts).
+  `root -l -b -q 'BuildFlagMasks.C+("<raw folder>","<output folder>")'`
+- `FlagSummary.C` -- how much each flag removes per dataset, quad selection
+  and exposure.
+- `FlagDisplay.C` -- charge map of one OHDU (white 0 e, yellow 1 e, red 5+ e)
+  with the standard mask in grey and the flags (or, with `lec = true`, the
+  LEC mask) in blue; writes PNG.
+
+Animation and utilities
+- `MaskAnimation.C` + `frames2gif.py` -- step-by-step frames (and a GIF) of
+  how the window scan is applied to one image.
+- `run_dataset.sh` -- runs the stages above for one dataset folder.
+- `merge_results.py` -- merges the r = 30 PDFs into one titled, bookmarked
+  PDF per dataset and quad selection (edit its `DATASETS` list for your
+  folders).
+- `pngs2pdf.py` -- combines PNGs into a PDF without recompression.
+- `config.yaml` -- quad selections, radii and input files. **Edit
+  `exposures` to point at your own copy of the data**; the paths here are
   placeholders.
 
 ## Requirements
 
-- [ROOT](https://root.cern) (with `yaml-cpp` available -- same as the rest of
-  this repo, see the top-level README)
+- [ROOT](https://root.cern) with `yaml-cpp` (as the rest of this repo)
+- Python 3 with Pillow (`frames2gif.py`, `pngs2pdf.py`)
+- poppler-utils (`pdftocairo`, `pdfinfo`) and Ghostscript (PDF cropping and
+  `merge_results.py`)
 
-## How to run
-
-From inside this folder:
-
-```
-root -l -b -q MaskScanManye.C
-root -l -b -q PlotWindowStats.C
-```
-
-and, if you also want the LEC-mask comparison plots:
+## Output layout (per dataset folder)
 
 ```
-root -l -b -q MaskScanManyeLEC.C
-root -l -b -q PlotQ1CutScan.C
+<quads>/e<exposure>/r30/      windowStatisticsManye_<quads>_<n>.root and the plot PDFs
+<quads>/lec/e<exposure>/r30/  LEC-mask windows
+imagerates/e<exposure>/       imageRates_<n>.root
 ```
 
-`MaskScanManye.C` and `MaskScanManyeLEC.C` will each take a while for a full
-sweep over many files (it's O(categories x exposures x radii x files));
-`PlotWindowStats.C` and `PlotQ1CutScan.C` run in seconds since they only
-re-read the small output trees. If a run is interrupted partway through,
-just re-run the same command -- both generation macros skip any output file
-that already exists, so nothing gets recomputed.
-
-## Output layout
-
-Everything is written under `<category>/e<exposure>/r<radius>/`, e.g.:
-
-```
-goodquads/
-  e72000/
-    r15/  windowStatisticsManye_goodquads_1.root ... _60.root
-          k_statistics_summary_goodquads_e72000_r15.pdf
-          q_statistics_summary_goodquads_e72000_r15.pdf
-          qcut_scan_summary_goodquads_e72000_r15.pdf
-          qcut_distribution_goodquads_e72000_r15.pdf
-    r20/  ...
-    r25/  ...
-    r30/  ...
-  e216000/
-    r15/  ...
-    ...
-  lec/
-    e72000/
-      r15/  windowStatisticsManye_goodquads_1.root ... _60.root  (LEC mask)
-      r20/  ...
-      ...
-    e216000/
-      ...
-notbadquads/
-  e72000/
-    ...
-  e216000/
-    ...
-  lec/
-    ...
-```
-
-- `windowStatisticsManye_<category>_<n>.root` -- one per input file, contains
-  the `windows` TTree (raw per-window data, including its own `exposure`,
-  `radius` and `maskBits` branches) and quick-look ratio histograms. Under
-  `lec/`, these were produced with the LEC mask bit added instead of the
-  standard mask.
-- `k_statistics_summary_<category>_e<exposure>_r<radius>.pdf` -- k1-k4 (raw
-  counts) and N distributions across all windows/files for that category,
-  exposure and radius, plus a stats box with totals.
-- `q_statistics_summary_<category>_e<exposure>_r<radius>.pdf` -- same, but
-  for q1-q4 = k1-k4 / N (per-window rates), plus N.
-- `qcut_scan_summary_<category>_e<exposure>_r<radius>.pdf` -- k_i, N, and
-  q_i = k_i/N, each of the 4 channels (i=1..4) scanned independently against
-  its own q_i cut (windows with q_i above that channel's cut are dropped for
-  that channel's curve), with LEC-mask reference lines overlaid. Produced by
-  `PlotQ1CutScan.C` from the standard-mask output plus the reference values
-  computed once from `lec/`.
-- `qcut_distribution_<category>_e<exposure>_r<radius>.pdf` -- a safety-check
-  histogram of the q1-q4 distributions (log-x), plus a weighted-combined
-  q = (k1 + 5*k2 + 10*(k3+k4))/N shown for reference only (not used by the
-  scan), with LEC reference lines.
-
-To decide which radius is optimal, compare the summary PDFs across
-`r15/r20/r25/r30` for a fixed category and exposure -- look at how the q
-distributions and their statistical spread (fewer windows but larger N vs.
-more windows but noisier per-window counts) change with radius. To check
-whether mask performance changes with exposure, compare across
-`e72000/e216000` at a fixed radius instead.
+`<n>` is the position of the input file in the config's list for that
+exposure; it is also used to match windows to image rates, because run IDs
+repeat between data campaigns.
 
 ## Config format
 
@@ -153,12 +126,11 @@ good_quads:
   <LTA>: [<OHDU>, ...]   # quads considered good, per LTA
 notbad_quads:
   <LTA>: [<OHDU>, ...]   # quads considered usable (superset of good_quads)
-radii: [15, 20, 25, 30]  # window radii (pixels) to scan
+radii: [30]              # window radii (pixels) to scan
 exposures:
-  <exposure>:            # e.g. 72000, 216000
+  <exposure>:            # e.g. 216000
     - /path/to/file1.root
     - ...
 ```
 
-LTAs/OHDUs not listed under a given category are excluded from that
-category's analysis entirely.
+LTAs/OHDUs not listed under a given selection are excluded from it.
