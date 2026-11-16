@@ -7,8 +7,14 @@
 //   flag A (bit 20, 0x100000): k2 >= 2, or k2 == 1 and k1 >= 2
 //   flag B (bit 21, 0x200000): k2 >= 2, or k2 == 1 and k1 >= 3
 //   flag C (bit 22, 0x400000): k2 >= 2, or k2 == 1 and k1 >= 5
-// and every pixel inside a flagged window's circle gets that flag's bit ORed
-// into calPixTree's "mask". The flags are nested (C implies B implies A).
+// and every pixel inside a flagged window's circle gets that flag. The flags
+// are nested (C implies B implies A).
+//
+// calPixTree keeps its "mask" exactly as in the input and gets three new
+// branches, one per flag:
+//   maskA = mask | 0x100000 if the pixel lies in a window flagged by A
+//   maskB = mask | 0x200000 if the pixel lies in a window flagged by B
+//   maskC = mask | 0x400000 if the pixel lies in a window flagged by C
 // The bits are outside every bit used by the original masks; a file whose
 // original masks already use any of them is not written.
 //
@@ -20,7 +26,7 @@
 //
 // The input file is never modified: a full copy is written to the output
 // folder under the same name, with every tree copied unchanged except
-// calPixTree (mask updated) and hitSumm (flagA/flagB/flagC added), plus a
+// calPixTree (maskA/maskB/maskC added) and hitSumm (flagA/flagB/flagC added), plus a
 // new "flagWindows" tree listing the flagged windows and a "flagSummary"
 // tree with per-image counts.
 //
@@ -214,7 +220,7 @@ int buildFlagMask(const string &inPath, const string &outPath){
         fs->Fill();
     }
 
-    // ---- copy every tree; calPixTree with the flag bits ORed into mask
+    // ---- copy every tree; calPixTree and hitSumm get the flag branches
     out->cd();
     TIter next(in->GetListOfKeys());
     TKey *key;
@@ -246,15 +252,17 @@ int buildFlagMask(const string &inPath, const string &outPath){
     cal->SetBranchAddress("ohdu",&co);    cal->SetBranchAddress("RUNID",&cr);
     out->cd();
     TTree *ncal = cal->CloneTree(0);
+    int mOut[NFLAG];
+    for(int b=0;b<NFLAG;b++)
+        ncal->Branch(Form("mask%s",FLAG_NAME[b]),&mOut[b],Form("mask%s/I",FLAG_NAME[b]));
     for(Long64_t i=0;i<nCal;i++){
         cal->GetEntry(i);
+        uint8_t fb = 0;
         if(cx>=0 && cx<NX && cy>=0 && cy<NY){
             auto it = flagPix.find(Img(cr,cl,co));
-            if(it!=flagPix.end()){
-                uint8_t fb = it->second[pix(cx,cy)];
-                for(int b=0;b<NFLAG;b++) if(fb>>b & 1) cm |= FLAG_BIT[b];
-            }
+            if(it!=flagPix.end()) fb = it->second[pix(cx,cy)];
         }
+        for(int b=0;b<NFLAG;b++) mOut[b] = cm | ((fb>>b & 1) ? FLAG_BIT[b] : 0);
         ncal->Fill();
     }
     ncal->Write();
@@ -289,9 +297,10 @@ int buildFlagMask(const string &inPath, const string &outPath){
     fw->Write();
     fs->Write();
     TNamed info("flagMaskInfo",
-        "calPixTree mask bits added by BuildFlagMasks.C on r = 30 windows (standard mask 0x56FC): "
+        "Window flags added by BuildFlagMasks.C on r = 30 windows (standard mask 0x56FC): "
         "0x100000 flag A: k2>=2 or (k2==1 and k1>=2); 0x200000 flag B: k2>=2 or (k2==1 and k1>=3); "
-        "0x400000 flag C: k2>=2 or (k2==1 and k1>=5); every pixel of a flagged window's circle gets the bit. "
+        "0x400000 flag C: k2>=2 or (k2==1 and k1>=5); every pixel of a flagged window's circle gets the flag. "
+        "calPixTree: mask unchanged; maskA/maskB/maskC = mask plus that flag's bit for pixels in a flagged window. "
         "hitSumm: flagA/flagB/flagC = flag plus that flag's bit if any pixel of the event carries it");
     info.Write();
 

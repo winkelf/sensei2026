@@ -81,12 +81,20 @@ int flagDisplay(const char *file, int run, int lta, int ohdu, const char *outFil
     cal->SetBranchAddress("x",&cx); cal->SetBranchAddress("y",&cy); cal->SetBranchAddress("ePix",&ce);
     cal->SetBranchAddress("mask",&cm); cal->SetBranchAddress("LTANAME",&cl);
     cal->SetBranchAddress("ohdu",&co); cal->SetBranchAddress("RUNID",&cr);
+    // flag bits come from maskA/maskB/maskC (mask is left as in the raw
+    // file); older copies had them ORed into mask, which still works
+    int mx[3] = {0,0,0};
+    bool hasX = cal->GetBranch("maskA") && cal->GetBranch("maskB") && cal->GetBranch("maskC");
+    if(hasX){
+        const char *nm[3] = {"maskA","maskB","maskC"};
+        for(int k=0;k<3;k++){ cal->SetBranchStatus(nm[k],1); cal->SetBranchAddress(nm[k],&mx[k]); }
+    }
     for(Long64_t i=0;i<cal->GetEntries();i++){
         cal->GetEntry(i);
         if(cr!=run || cl!=lta || co!=ohdu) continue;
         if(cx<0||cx>=NX||cy<0||cy>=NY) continue;
         charge[cx*NY+cy] = ce;
-        mask[cx*NY+cy]   = cm;
+        mask[cx*NY+cy]   = hasX ? (cm | mx[0] | mx[1] | mx[2]) : cm;
     }
 
     int nWinFlag[3] = {0,0,0};

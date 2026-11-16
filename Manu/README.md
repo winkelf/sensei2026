@@ -68,7 +68,7 @@ Plots (all read only the small `windows` trees, so they run in seconds)
 
 Window-flag masks
 - `BuildFlagMasks.C` -- writes a full copy of every input file (inputs are
-  never modified) with three new mask bits in `calPixTree`'s `mask`, set on
+  never modified) with three window flags, each with its own mask bit, set on
   every pixel of a flagged r = 30 window (standard mask 0x56FC):
 
   | bit | flag | window flagged if |
@@ -77,7 +77,9 @@ Window-flag masks
   | 0x200000 | B | k2 >= 2, or k2 = 1 and k1 >= 3 |
   | 0x400000 | C | k2 >= 2, or k2 = 1 and k1 >= 5 |
 
-  `hitSumm` keeps its `flag` (OR of the masks of the event's pixels) and gets
+  `calPixTree` keeps its `mask` exactly as in the input and gets `maskA`,
+  `maskB`, `maskC` = `mask` plus that flag's bit for pixels in a flagged
+  window. `hitSumm` keeps its `flag` (OR of the masks of the event's pixels) and gets
   `flagA`, `flagB`, `flagC` = `flag` plus that flag's bit if any pixel of the
   event carries it. The copy also has `flagWindows` (the flagged windows) and
   `flagSummary` (per-image counts).
